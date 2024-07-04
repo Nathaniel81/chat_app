@@ -4,14 +4,13 @@ FROM python:3.11.4-slim-bullseye
 # Set environment variables
 ENV PYTHONUNBUFFERED=1
 ENV PYTHONDONTWRITEBYTECODE=1
+ENV DJANGO_SETTINGS_MODULE=chat.settings  # Add this line
 
 # Set the working directory
 WORKDIR /app
 
 # Install system dependencies
-RUN apt-get update && apt-get install -y python3-venv
-
-RUN apt-get install -y gcc
+RUN apt-get update && apt-get install -y python3-venv gcc
 
 # Create and activate a virtual environment
 RUN python3 -m venv /opt/venv
@@ -26,4 +25,4 @@ RUN pip install -r requirements.txt
 COPY . /app
 
 # Define the entrypoint for the web service
-CMD ["gunicorn", "chat.asgi", "-b", "0.0.0.0:8000"]
+CMD ["gunicorn", "chat.asgi:application", "-b", "0.0.0.0:8000", "-k", "uvicorn.workers.UvicornWorker"]
