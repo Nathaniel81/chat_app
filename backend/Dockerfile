@@ -4,7 +4,7 @@ FROM python:3.11.4-slim-bullseye
 # Set environment variables
 ENV PYTHONUNBUFFERED=1
 ENV PYTHONDONTWRITEBYTECODE=1
-ENV DJANGO_SETTINGS_MODULE=chat.settings  # Add this line
+ENV DJANGO_SETTINGS_MODULE=chat.settings
 
 # Set the working directory
 WORKDIR /app
