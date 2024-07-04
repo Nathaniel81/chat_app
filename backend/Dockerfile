@@ -11,6 +11,8 @@ WORKDIR /app
 # Install system dependencies
 RUN apt-get update && apt-get install -y python3-venv
 
+RUN sudo apt-get install gcc
+
 # Create and activate a virtual environment
 RUN python3 -m venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
