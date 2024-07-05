@@ -40,9 +40,8 @@ const Sidebar: React.FC<SidebarProps> = ({ onUserSelect }) => {
   }, []);
 
   useEffect(() => {
-    const newClient = new WebSocket(`ws://127.0.0.1:8000/ws/chat/global/?user_id=${currentUser?.id}`);
+    const newClient = new WebSocket(`wss://chat-api-e2xv.onrender.com/ws/chat/global/?user_id=${currentUser?.id}`);
     clientRef.current = newClient;
-
     newClient.onmessage = (message) => {
       const data = JSON.parse(message.data as string);
       if (data.type === 'user_status') {
@@ -53,7 +52,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onUserSelect }) => {
         );
       }
     };
-
+  
     return () => {
       newClient.close();
     };
