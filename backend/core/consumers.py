@@ -103,6 +103,7 @@ class GlobalConsumer(AsyncWebsocketConsumer):
         )
 
         await self.accept()
+        await self.update_user_status(user, True)
         await self.broadcast_user_status(user.username, 'online')
 
     async def disconnect(self, close_code):
@@ -111,8 +112,10 @@ class GlobalConsumer(AsyncWebsocketConsumer):
             self.channel_name
         )
 
+        # Mark user as offline and broadcast to global room
         user = self.scope.get("user")
         if user:
+            await self.update_user_status(user, False)
             await self.broadcast_user_status(user.username, 'offline')
 
     async def receive(self, text_data):
@@ -137,6 +140,11 @@ class GlobalConsumer(AsyncWebsocketConsumer):
             'user': user,
             'status': status
         }))
+
+    @sync_to_async
+    def update_user_status(self, user, is_online):
+        user.is_online = is_online
+        user.save()
 
     @sync_to_async
     def get_user(self, user_id):
