@@ -36,7 +36,8 @@ const Chat: React.FC = () => {
       clientRef.current.close();
     }
 
-    const newClient = new WebSocket(`ws://127.0.0.1:8000/ws/chat/${roomName}/?user_id=${loggedUser?.current.id}`);
+    // const newClient = new WebSocket(`ws://127.0.0.1:8000/ws/chat/${roomName}/?user_id=${loggedUser?.current.id}`);
+    const newClient = new WebSocket(`wss://chat-api-e2xv.onrender.com/ws/chat/${roomName}/?user_id=${loggedUser?.current.id}`);
     clientRef.current = newClient;
 
     newClient.onopen = () => {
