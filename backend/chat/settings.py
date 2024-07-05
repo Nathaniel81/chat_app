@@ -31,7 +31,6 @@ SECRET_KEY = 'django-insecure-#m&2&qp0lx&s=5ercy81vb)xxz_^o(#pgqozewfy&-bi$j5u8)
 DEBUG = True
 
 ALLOWED_HOSTS = ['chat-api-e2xv.onrender.com']
-# ALLOWED_HOSTS = ['*']
 
 CORS_ALLOWED_ORIGINS = [
     'https://chat-app-phpi.onrender.com'
@@ -56,6 +55,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
