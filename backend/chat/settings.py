@@ -30,12 +30,12 @@ SECRET_KEY = 'django-insecure-#m&2&qp0lx&s=5ercy81vb)xxz_^o(#pgqozewfy&-bi$j5u8)
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-# ALLOWED_HOSTS = ['chat-api-e2xv.onrender.com']
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['chat-api-e2xv.onrender.com']
+# ALLOWED_HOSTS = ['*']
 
-# CORS_ALLOWED_ORIGINS = [
-#     'https://chat-app-phpi.onrender.com'
-# ]
+CORS_ALLOWED_ORIGINS = [
+    'https://chat-app-phpi.onrender.com'
+]
 
 
 # Application definition
