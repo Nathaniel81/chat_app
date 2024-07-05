@@ -23,7 +23,7 @@ from channels.security.websocket import AllowedHostsOriginValidator
 from core.routing import websocket_urlpatterns
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'chat.settings')
-django.setup()  # Ensure Django setup is called
+django.setup()
 
 application = ProtocolTypeRouter({
     "http": get_asgi_application(),
