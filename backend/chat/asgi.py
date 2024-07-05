@@ -27,13 +27,20 @@ from channels.security.websocket import AllowedHostsOriginValidator
 from core.routing import websocket_urlpatterns
 
 
+# application = ProtocolTypeRouter({
+#     "http": get_asgi_application(),
+#     "websocket": AllowedHostsOriginValidator(
+#         AuthMiddlewareStack(
+#             URLRouter(
+#                 websocket_urlpatterns
+#             )
+#         )
+#     ),
+# })
+
+application = get_asgi_application()
+
 application = ProtocolTypeRouter({
-    "http": get_asgi_application(),
-    "websocket": AllowedHostsOriginValidator(
-        AuthMiddlewareStack(
-            URLRouter(
-                websocket_urlpatterns
-            )
-        )
-    ),
+    "http": application,
+    "websocket": URLRouter(websocket_urlpatterns),
 })
