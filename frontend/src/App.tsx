@@ -1,25 +1,17 @@
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import Chat from './pages/Chat';
-import SignIn from './pages/Signin';
+import LeftPanel from "./components/LeftPanel";
+import RightPanel from "./components/RightPanel";
 
-const style = {
-  appContainer: `max-w-[728px] mx-auto text-center`,
-  sectionContainer: `flex flex-col h-[90vh] bg-gray-100 mt-10 shadow-xl border relative`,
-};
 
 function App() {
-  return (
-    <Router>
-        <div className={style.appContainer}>
-          <section className={style.sectionContainer}>
-            <Routes>
-              <Route index element={<Chat />} />
-              <Route path="/signin" element={<SignIn />} />
-            </Routes>
-          </section>
-        </div>
-    </Router>
-  );
+	return (
+		<main className='m-5'>
+			<div className='flex overflow-y-hidden h-[calc(100vh-50px)] max-w-[1700px] mx-auto bg-left-panel'>
+				<div className='fixed top-0 left-0 w-full h-36 bg-green-primary dark:bg-transparent -z-30' />
+				<LeftPanel />
+				<RightPanel />
+			</div>
+		</main>
+	);
 }
 
 export default App;
