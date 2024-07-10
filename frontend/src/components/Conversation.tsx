@@ -21,8 +21,9 @@ interface ConversationProps {
 
 const Conversation = ({ conversation }: ConversationProps) => {
   const { user } = useUser();
+  const secondUser = conversation.participants.filter((p) => p.id !== user?.id)[0];
   const conversationImage = conversation.group_image || "/placeholder.png";
-  const conversationName = conversation.is_group ? "Group Chat" : conversation.participants.filter((p) => p.id !== user?.id)[0]?.username;
+  const conversationName = conversation.is_group ? "Group Chat" : secondUser?.username;
   const lastMessage = conversation.last_message;
   const lastMessageType = lastMessage?.message_type;
   
@@ -30,7 +31,7 @@ const Conversation = ({ conversation }: ConversationProps) => {
       <>
         <div className={`flex gap-2 items-center p-3 hover:bg-chat-hover cursor-pointer`}>
           <Avatar className='border border-gray-900 overflow-visible relative'>
-            {conversation.is_online && (
+            {secondUser?.is_online && (
               <div className='absolute top-0 right-0 w-2.5 h-2.5 bg-green-500 rounded-full border-2 border-foreground' />
             )}
             <AvatarImage src={conversationImage} className='object-cover rounded-full' />

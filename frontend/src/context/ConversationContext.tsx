@@ -14,6 +14,7 @@ interface ConversationContextType {
   addConversation: (conversation: Conversation) => void;
   fetchConversations: () => void;
   updateConversation: (conversationId: number, updatedFields: Partial<Conversation>) => void;
+  updateUserStatus: (username: string, is_online: boolean) => void;
 }
 
 const ConversationContext = createContext<ConversationContextType | undefined>(undefined);
@@ -49,6 +50,17 @@ export const ConversationProvider = ({ children }: { children: ReactNode }) => {
     setConversations((prevConversations) => [conversation, ...prevConversations]);
   };
 
+  const updateUserStatus = (username: string, is_online: boolean) => {
+    setConversations((prevConversations) =>
+        prevConversations.map((conv) => ({
+            ...conv,
+            participants: conv.participants.map((user) =>
+                user.username === username ? { ...user, is_online } : user
+            ),
+        }))
+    );
+};
+
   useEffect(() => {
     fetchConversations();
   }, []);
@@ -61,6 +73,7 @@ export const ConversationProvider = ({ children }: { children: ReactNode }) => {
       addConversation, 
       fetchConversations,
       updateConversation,
+      updateUserStatus,
       }}>
       {children}
     </ConversationContext.Provider>
