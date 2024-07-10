@@ -44,27 +44,32 @@ class ChatConsumer(AsyncWebsocketConsumer):
         user = text_data_json['user']
 
         # Save message to the database
-        await self.save_message(self.room_name, user, text)
+        message = await self.save_message(self.room_name, user, text)
 
         # Send message to room group
         await self.channel_layer.group_send(
             self.room_group_name,
             {
                 'type': 'chat_message',
-                'text': text,
-                'user': user,
+                'message': {
+                    'id': message.id,
+                    'text': message.text,
+                    'user': {
+                        'id': message.user.id,
+                        'username': message.user.username,
+                        'is_online': message.user.is_online,
+                    },
+                    'created_at': message.created_at.isoformat(),
+                    'message_type': 'text',
+                }
             }
         )
 
     async def chat_message(self, event):
-        text = event['text']
-        user = event['user']
+        message = event['message']
 
         # Send message to WebSocket
-        await self.send(text_data=json.dumps({
-            'text': text,
-            'user': user,
-        }))
+        await self.send(text_data=json.dumps(message))
 
     @sync_to_async
     def get_user(self, user_id):
@@ -77,7 +82,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
     def save_message(self, room_name, sender_username, message):
         room, created = ChatRoom.objects.get_or_create(name=room_name)
         user = User.objects.get(username=sender_username)
-        Message.objects.create(chat_room=room, user=user, text=message)
+        message = Message.objects.create(chat_room=room, user=user, text=message)
+        return message
 
 class GlobalConsumer(AsyncWebsocketConsumer):
     async def connect(self):
