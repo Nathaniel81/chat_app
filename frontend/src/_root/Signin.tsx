@@ -1,38 +1,36 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useUser } from '../context/UserContext';
 
 const SignIn: React.FC = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
+  const { setUser } = useUser();
 
   const handleSignIn = async () => {
     const url = '/api/user/login/';
-    const data = {
-        username,
-        password
-    };
+    const data = { username, password };
 
     try {
-        const response = await fetch(url, {
-            method: 'POST',
-            body: JSON.stringify(data),
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        });
+      const response = await fetch(url, {
+        method: 'POST',
+        body: JSON.stringify(data),
+        headers: { 'Content-Type': 'application/json' },
+      });
 
-        if (response.ok) {
-            const responseData = await response.json();
-            localStorage.setItem('user', JSON.stringify(responseData));
-            navigate('/')
-        } else {
-            console.error('Login failed. Check your credentials or API response.');
-        }
+      if (response.ok) {
+        const responseData = await response.json();
+        localStorage.setItem('user', JSON.stringify(responseData));
+        setUser(responseData);
+        navigate('/');
+      } else {
+        console.error('Login failed. Check your credentials or API response.');
+      }
     } catch (error) {
-        console.error('Error making the request:', error);
+      console.error('Error making the request:', error);
     }
-};
+  };
 
   return (
     <div className="signin-container flex flex-col items-center justify-center h-screen bg-gray-100">

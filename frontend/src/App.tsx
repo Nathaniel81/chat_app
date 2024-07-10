@@ -1,17 +1,17 @@
-import LeftPanel from "./components/LeftPanel";
-import RightPanel from "./components/RightPanel";
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import MainApp from './_root/MainApp';
+import SignIn from './_root/Signin';
 
 
-function App() {
-	return (
-		<main className='m-5'>
-			<div className='flex overflow-y-hidden h-[calc(100vh-50px)] max-w-[1700px] mx-auto bg-left-panel'>
-				<div className='fixed top-0 left-0 w-full h-36 bg-green-primary dark:bg-transparent -z-30' />
-				<LeftPanel />
-				<RightPanel />
-			</div>
-		</main>
-	);
-}
+const App = () => {
+    return (
+        <Router>
+          <Routes>
+            <Route path="/" element={<MainApp />} />
+            <Route path="/signin" element={<SignIn />} />
+          </Routes>
+        </Router>
+    );
+  };
 
 export default App;
