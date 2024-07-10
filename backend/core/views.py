@@ -10,12 +10,13 @@ from rest_framework_simplejwt import tokens
 from rest_framework_simplejwt.views import TokenObtainPairView
 from django.shortcuts import get_object_or_404
 
-from .models import User, ChatRoom, Message
+from .models import User, ChatRoom, Message, Conversation
 from .serializers import (
     MyTokenObtainPairSerializer,
     UserSerializer, 
     ChatRoomSerializer, 
-    MessageSerializer
+    MessageSerializer,
+    ConversationSerializer
     )
 
 class LoginRateThrottle(AnonRateThrottle):
@@ -185,4 +186,33 @@ class MessageListView(generics.ListAPIView):
 
         return Message.objects.filter(chat_room=chat_room).order_by('created_at')
 
+class ConversationListCreateView(generics.ListCreateAPIView):
+    queryset = Conversation.objects.all()
+    serializer_class = ConversationSerializer
+    # permission_classes = [IsAuthenticated]
 
+    def get_queryset(self):
+        user = User.objects.get(username='B_admin')  # For now, using this user
+        # user = self.request.user
+        return Conversation.objects.filter(participants=user)
+
+    def perform_create(self, serializer):
+        data = self.request.data
+        participants = data.get('participants')
+        is_group = data.get('is_group')
+        group_name = data.get('group_name')
+
+        participants_ids = [user.get('id') for user in participants]
+
+        if not is_group and len(participants) == 2:
+            room_name = data.get('room_name')
+        else:
+            room_name = group_name
+
+        chat_room, created = ChatRoom.objects.get_or_create(name=room_name)
+        serializer.save(chat_room=chat_room, participants=participants_ids)
+
+class ConversationRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Conversation.objects.all()
+    serializer_class = ConversationSerializer
+    # permission_classes = [IsAuthenticated]

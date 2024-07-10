@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework_simplejwt.tokens import RefreshToken
-from .models import User, ChatRoom, Message
+from .models import User, ChatRoom, Message, Conversation
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -15,11 +15,11 @@ class UserSerializer(serializers.ModelSerializer):
         fields = ['id', 'username', 'is_online']
 
 class MessageSerializer(serializers.ModelSerializer):
-    user = serializers.StringRelatedField()
+    user = UserSerializer(read_only=True)
 
     class Meta:
         model = Message
-        fields = ['id', 'user', 'text', 'created_at']
+        fields = ['id', 'user', 'text', 'message_type', 'created_at']
 
 class ChatRoomSerializer(serializers.ModelSerializer):
     messages = MessageSerializer(many=True, read_only=True)
@@ -28,6 +28,19 @@ class ChatRoomSerializer(serializers.ModelSerializer):
         model = ChatRoom
         fields = ['id', 'name', 'messages']
 
+class ConversationSerializer(serializers.ModelSerializer):
+    admin = UserSerializer(read_only=True)
+    participants = UserSerializer(read_only=True, many=True)
+    chat_room = serializers.StringRelatedField()
+    last_message = serializers.SerializerMethodField(read_only=True)
+
+    class Meta:
+        model = Conversation
+        fields = '__all__'
+
+    def get_last_message(self, obj):
+        last_message = obj.chat_room.messages.last()
+        return MessageSerializer(last_message).data if last_message else None
 
 class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
     """

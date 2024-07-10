@@ -7,7 +7,9 @@ urlpatterns = [
     path('user/logout/', views.LogoutView.as_view(), name='logout'),
     path('user/refresh/', views.RefreshTokenView.as_view(), name='token_refresh'),
 
+    path('user/conversations/', views.ConversationListCreateView.as_view(), name='conversation_list_create'),
+    path('user/conversations/<int:pk>/', views.ConversationRetrieveUpdateDestroyView.as_view(), name='conversation_detail'),
+
     path('chatrooms/', views.ChatRoomView.as_view(), name='chat_room'),
     path('messages/<str:room_name>/', views.MessageListView.as_view(), name='message_list'),
-
 ]
