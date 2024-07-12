@@ -65,6 +65,28 @@ class ChatConsumer(AsyncWebsocketConsumer):
             }
         )
 
+        # Send message to global group for updating the conversation list
+        await self.channel_layer.group_send(
+            'chat_global',
+            {
+                'type': 'global_message',
+                'message': {
+                    'room_name': self.room_name,
+                    'last_message': {
+                        'id': message.id,
+                        'text': message.text,
+                        'user': {
+                            'id': message.user.id,
+                            'username': message.user.username,
+                            'is_online': message.user.is_online,
+                        },
+                        'created_at': message.created_at.isoformat(),
+                        'message_type': 'text',
+                    }
+                }
+            }
+        )
+
     async def chat_message(self, event):
         message = event['message']
 
@@ -145,6 +167,16 @@ class GlobalConsumer(AsyncWebsocketConsumer):
             'type': 'user_status',
             'user': user,
             'status': status
+        }))
+
+    async def global_message(self, event):
+        message = event['message']
+
+        # Send message to WebSocket
+        await self.send(text_data=json.dumps({
+            'type': 'global_message',
+            'room_name': message['room_name'],
+            'last_message': message['last_message']
         }))
 
     @sync_to_async
