@@ -11,6 +11,7 @@ export interface IMessage {
   user: IUser;
   text: string;
   message_type: string;
+  seen_by: number[] | undefined;
   created_at: string;
 }
   
@@ -24,4 +25,5 @@ export interface Conversation {
   group_name: string;
   created_at: string;
   last_message?: IMessage;
+  messages: IMessage[];
 }

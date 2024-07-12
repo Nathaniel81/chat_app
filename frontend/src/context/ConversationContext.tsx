@@ -1,10 +1,4 @@
-import { 
-  createContext, 
-  useState, 
-  useContext, 
-  ReactNode, 
-  useEffect 
-} from 'react';
+import { createContext, useState, useContext, ReactNode, useEffect } from 'react';
 import { Conversation } from '../types';
 
 interface ConversationContextType {
@@ -14,7 +8,9 @@ interface ConversationContextType {
   addConversation: (conversation: Conversation) => void;
   fetchConversations: () => void;
   updateConversation: (conversationId: number, updatedFields: Partial<Conversation>) => void;
+  updateLastMessage: (roomName: string, lastMessage: any) => void;
   updateUserStatus: (username: string, is_online: boolean) => void;
+  updateMessageSeenStatus: (messageId: number, seenBy: number[]) => void;
 }
 
 const ConversationContext = createContext<ConversationContextType | undefined>(undefined);
@@ -46,6 +42,14 @@ export const ConversationProvider = ({ children }: { children: ReactNode }) => {
     );
   };
 
+  const updateLastMessage = (roomName: string, lastMessage: any) => {
+    setConversations((prevConversations) =>
+      prevConversations.map((conv) =>
+        conv.chat_room === roomName ? { ...conv, last_message: lastMessage } : conv
+      )
+    );
+  };
+
   const addConversation = (conversation: Conversation) => {
     setConversations((prevConversations) => [conversation, ...prevConversations]);
   };
@@ -61,6 +65,17 @@ export const ConversationProvider = ({ children }: { children: ReactNode }) => {
     );
 };
 
+const updateMessageSeenStatus = (messageId: number, seenBy: number[]) => {
+  setConversations((prevConversations) =>
+    prevConversations.map((conv) => ({
+      ...conv,
+      messages: conv.messages.map((msg) =>
+        msg.id === messageId ? { ...msg, seen_by: seenBy } : msg
+      ),
+    }))
+  );
+};
+
   useEffect(() => {
     fetchConversations();
   }, []);
@@ -73,7 +88,9 @@ export const ConversationProvider = ({ children }: { children: ReactNode }) => {
       addConversation, 
       fetchConversations,
       updateConversation,
+      updateLastMessage,
       updateUserStatus,
+      updateMessageSeenStatus
       }}>
       {children}
     </ConversationContext.Provider>
