@@ -16,10 +16,11 @@ class UserSerializer(serializers.ModelSerializer):
 
 class MessageSerializer(serializers.ModelSerializer):
     user = UserSerializer(read_only=True)
+    seen_by = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
 
     class Meta:
         model = Message
-        fields = ['id', 'user', 'text', 'message_type', 'created_at']
+        fields = ['id', 'user', 'text', 'message_type', 'seen_by', 'created_at']
 
 class ChatRoomSerializer(serializers.ModelSerializer):
     messages = MessageSerializer(many=True, read_only=True)

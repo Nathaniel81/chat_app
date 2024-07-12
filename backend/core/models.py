@@ -30,6 +30,7 @@ class Message(models.Model):
     user = models.ForeignKey(User, related_name='messages', on_delete=models.CASCADE)
     text = models.TextField()
     message_type = models.CharField(max_length=10, choices=MESSAGE_TYPE_CHOICES, default=TEXT)
+    seen_by = models.ManyToManyField(User, related_name='seen_messages', blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
