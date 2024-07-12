@@ -26,6 +26,7 @@ const Conversation = ({ conversation }: ConversationProps) => {
   const conversationName = conversation.is_group ? "Group Chat" : secondUser?.username;
   const lastMessage = conversation.last_message;
   const lastMessageType = lastMessage?.message_type;
+  const messageSeen = lastMessage?.seen_by?.includes(user?.id ?? 0);
   
   return (
       <>
@@ -47,7 +48,8 @@ const Conversation = ({ conversation }: ConversationProps) => {
               </span>
             </div>
             <p className='text-[12px] mt-1 text-gray-500 flex items-center gap-1 '>
-              {lastMessage?.user.id === user?.id && <MessageSeenSvg />}
+              {/* {lastMessage?.user.id === user?.id && <MessageSeenSvg />} */}
+              {lastMessage?.user.id === user?.id && messageSeen && <MessageSeenSvg />}
               {conversation.is_group && <Users size={16} />}
               {!lastMessage && "Say Hi!"}
               {lastMessage && lastMessageType === "text" && lastMessage?.text?.length > 30 ? (

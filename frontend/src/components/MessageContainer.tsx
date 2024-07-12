@@ -12,6 +12,7 @@ interface MessageContainerProps {
 const MessageContainer: React.FC<MessageContainerProps> = ({ messages: msgs }) => {
   const { selectedConversation, updateConversation } = useConversation();
   const [messages, setMessages] = useState<IMessage[]>([]);
+  const [loading, setLoading] = useState(true);
   const lastMessageRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -23,7 +24,9 @@ const MessageContainer: React.FC<MessageContainerProps> = ({ messages: msgs }) =
   useEffect(() => {
     if (msgs.length > 0 && selectedConversation) {
       const newMessage = msgs[msgs.length - 1];
-      setMessages((prevMessages) => [...prevMessages, ...msgs]);
+      if (!loading) {
+        setMessages((prevMessages) => [...prevMessages, ...msgs]);
+      }
       // Update the last message of the selected conversation
       updateConversation(selectedConversation.id, { last_message: newMessage });
     }
@@ -49,6 +52,7 @@ const MessageContainer: React.FC<MessageContainerProps> = ({ messages: msgs }) =
     } catch (error) {
       console.error('Failed to fetch messages:', error);
     }
+    setLoading(false);
   };
 
   if (!selectedConversation) {
