@@ -167,7 +167,12 @@ class RefreshTokenView(APIView):
 
 class UserListView(generics.ListAPIView):
     serializer_class = UserSerializer
-    queryset = User.objects.all()
+
+    def get_queryset(self):
+        user_id = self.request.query_params.get('user_id', None)
+        if user_id is not None:
+            return User.objects.exclude(id=user_id)
+        return User.objects.all()
 
 class ChatRoomView(generics.ListCreateAPIView):
     queryset = ChatRoom.objects.all()

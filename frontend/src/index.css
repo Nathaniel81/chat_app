@@ -4,22 +4,8 @@
 
 @layer base {
 	:root {
-		--background: 48, 8%, 88%; /* CHANGED */
+		--background: 0 0% 100%;
 		--foreground: 222.2 84% 4.9%;
-
-		/* CLASSES ADDED BY US */
-		--container: 0 0 100%;
-		--left-panel: 203, 32%, 10%;
-
-		--gray-primary: 216, 20%, 95%;
-		--gray-secondary: 216, 20%, 95%;
-
-		--left-panel: 100, 100%, 100%;
-		--chat-hover: 180, 5%, 96%;
-
-		--green-primary: 167, 100%, 33%;
-		--green-chat: 111, 91%, 91%;
-		/* CLASSES ADDED BY US */
 
 		--card: 0 0% 100%;
 		--card-foreground: 222.2 84% 4.9%;
@@ -50,24 +36,8 @@
 	}
 
 	.dark {
-		--background: 202, 31%, 7%; /* CHANGED */
+		--background: 222.2 84% 4.9%;
 		--foreground: 210 40% 98%;
-
-		/* CLASSES ADDED BY US: */
-		--container: 202, 31%, 7%;
-
-		--gray-primary: 202, 23%, 16%;
-		--gray-secondary: 202, 22%, 17%;
-
-		--left-panel: 203, 32%, 10%;
-		--chat-hover: 202, 23%, 16%;
-
-		--green-primary: 167, 100%, 33%;
-		--green-secondary: 165, 100%, 39%;
-		--green-chat: 169, 100%, 18%;
-
-		--gray-tertiary: 203, 22%, 21%;
-		/* CLASSES ADDED BY US */
 
 		--card: 222.2 84% 4.9%;
 		--card-foreground: 210 40% 98%;
@@ -105,16 +75,23 @@
 	}
 }
 
-/* WE ADDED => DARK MODE THIN SCROLLBAR */
+/* rounded cool looking scrollbar */
 @layer components {
 	::-webkit-scrollbar {
-		width: 8px;
+		width: 6px;
+		height: 6px;
 	}
+
 	::-webkit-scrollbar-thumb {
-		background-color: hsl(var(--gray-primary));
-		border-radius: 4px;
+		background-color: hsl(var(--muted));
+		border-radius: 6px;
 	}
+
 	::-webkit-scrollbar-track {
-		background-color: hsl(var(--container));
+		background-color: hsl(var(--background));
 	}
+}
+
+.bg-noise {
+	background-image: url("/noise.svg");
 }

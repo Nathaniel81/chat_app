@@ -13,6 +13,7 @@ const RightPanel = () => {
   const { user: loggedUser } = useUser();
   const clientRef = useRef<WebSocket | null>(null);
   const [messages, setMessages] = useState<IMessage[]>([]);  
+
   const connectWebSocket = useCallback((roomName: string) => {
     if (clientRef.current) {
         clientRef.current.close();
@@ -40,7 +41,8 @@ const RightPanel = () => {
     if (selectedConversation) {
         connectWebSocket(selectedConversation.chat_room);
     }
-  }, [selectedConversation, loggedUser, connectWebSocket]); 
+  }, [selectedConversation, loggedUser, connectWebSocket]);
+
   if (!selectedConversation) return <ChatPlaceHolder />; 
   const conversationName = selectedConversation.is_group
     ? selectedConversation.group_name
