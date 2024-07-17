@@ -37,7 +37,6 @@ const MessageContainer = () => {
 
     newClient.onmessage = (message) => {
       const data = JSON.parse(message.data as string);
-      console.log(data);
       setMessages((prevMessages) => [...prevMessages, data]);
     };
 

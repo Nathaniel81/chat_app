@@ -56,9 +56,10 @@ class ChatConsumer(AsyncWebsocketConsumer):
             text_data_json = json.loads(text_data)
             text = text_data_json['text']
             userId = text_data_json['userId']
+            message_type = text_data_json['messageType']
 
             # Save message to the database
-            message = await self.save_message(self.room_name, userId, text)
+            message = await self.save_message(self.room_name, userId, text, message_type)
 
             if message:  # Ensure message is not None
                 serialized_message = await self.serialize_message(message)
@@ -98,11 +99,11 @@ class ChatConsumer(AsyncWebsocketConsumer):
             return None
 
     @sync_to_async
-    def save_message(self, room_name, sender_id, message_text):
+    def save_message(self, room_name, sender_id, message_text, message_type):
         try:
             room, _ = ChatRoom.objects.get_or_create(name=room_name)
             user = User.objects.get(id=sender_id)
-            message = Message.objects.create(chat_room=room, user=user, text=message_text)
+            message = Message.objects.create(chat_room=room, user=user, text=message_text, message_type=message_type)
             return message
         except Exception as e:
             logger.error(f"Error in save_message method: {e}")

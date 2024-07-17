@@ -1,9 +1,18 @@
-import { AnimatePresence, motion } from "framer-motion";
-import { Loader, SendHorizontal, ThumbsUp } from "lucide-react";
-import { Textarea } from "../ui/textarea";
 import { useRef, useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
+import { Loader, SendHorizontal, ThumbsUp, Image as ImageIcon } from "lucide-react";
+import { Textarea } from "../ui/textarea";
 import { Button } from "../ui/button";
 import { IUser } from "../../types";
+import EmojiPicker from "./EmojiPicker";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+  DialogDescription
+} from "../ui/dialog";
 
 interface ChatBottomBarProps {
   clientRef: React.MutableRefObject<WebSocket | null>;
@@ -12,6 +21,7 @@ interface ChatBottomBarProps {
 
 const ChatBottomBar: React.FC<ChatBottomBarProps> = ({ clientRef, loggedUser }) => {
   const [msgText, setMsgText] = useState("");
+  const [imgUrl, setImgUrl] = useState<string | null>(null);
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
   const isPending = false;
 
@@ -29,14 +39,77 @@ const ChatBottomBar: React.FC<ChatBottomBarProps> = ({ clientRef, loggedUser }) 
   const handleSendMessage = (e: React.FormEvent) => {
     e.preventDefault();
     if (msgText.trim() !== '' && clientRef.current) {
-      const message = { text: msgText, userId: loggedUser?.id };
+      const message = { text: msgText, userId: loggedUser?.id, messageType: 'text' };
       clientRef.current.send(JSON.stringify(message));
       setMsgText('');
     }
   };
 
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("upload_preset", "chat_images");
+
+    try {
+      const response = await fetch("https://api.cloudinary.com/v1_1/dqm9mc5da/image/upload", {
+        method: "POST",
+        body: formData,
+      });
+      const data = await response.json();
+      setImgUrl(data.secure_url);
+    } catch (error) {
+      console.error("Image upload error:", error);
+    }
+  };
+
   return (
     <div className='p-2 flex justify-between w-full items-center gap-2'>
+      {!msgText.trim() && (
+        <label>
+          <input
+            type="file"
+            accept="image/*"
+            style={{ display: "none" }}
+            onChange={handleImageUpload}
+          />
+          <ImageIcon
+            size={20}
+            className='cursor-pointer text-muted-foreground'
+          />
+        </label>
+      )}
+
+      <Dialog open={!!imgUrl}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Image Preview</DialogTitle>
+            <DialogDescription>
+              This is a preview of the image you are about to send.
+            </DialogDescription>
+          </DialogHeader>
+          <div className='flex justify-center items-center relative h-96 w-full mx-auto'>
+            <img src={imgUrl!} alt='Image Preview' className='object-contain' />
+          </div>
+          <DialogFooter>
+            <Button
+              type='submit'
+              onClick={() => {
+                if (clientRef.current && imgUrl) {
+                  const message = { text: imgUrl, userId: loggedUser?.id, messageType: "image" };
+                  clientRef.current.send(JSON.stringify(message));
+                  setImgUrl(null);
+                }
+              }}
+            >
+              Send
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       <AnimatePresence>
         <motion.div
           layout
@@ -65,14 +138,14 @@ const ChatBottomBar: React.FC<ChatBottomBarProps> = ({ clientRef, loggedUser }) 
             ref={textAreaRef}
           />
           <div className='absolute right-2 bottom-0.5'>
-            {/* <EmojiPicker
+            <EmojiPicker
               onChange={(emoji) => {
                 setMsgText(msgText + emoji);
                 if (textAreaRef.current) {
                   textAreaRef.current.focus();
                 }
               }}
-            /> */}
+            />
           </div>
         </motion.div>
 
@@ -97,7 +170,7 @@ const ChatBottomBar: React.FC<ChatBottomBarProps> = ({ clientRef, loggedUser }) 
                 className='text-muted-foreground'
                 onClick={() => {
                   if (clientRef.current) {
-                    const message = { text: "👍", user: loggedUser?.username };
+                    const message = { text: "👍", userId: loggedUser?.id, messageType: "text" };
                     clientRef.current.send(JSON.stringify(message));
                   }
                 }}
