@@ -26,7 +26,7 @@ const MessageList = ({ messages, messagesLoading }: MessageListProps) => {
     <div ref={messageContainerRef} className="w-full overflow-y-auto overflow-x-hidden h-full flex flex-col">
       <AnimatePresence>
         {!messagesLoading &&
-          messages.map((message, index) => (
+          messages?.map((message, index) => (
             <motion.div
               key={index}
               layout
@@ -61,7 +61,7 @@ const MessageList = ({ messages, messagesLoading }: MessageListProps) => {
                   </Avatar>
                 )}
                 {message.message_type === "text" ? (
-                  <span className="bg-accent p-3 rounded-md max-w-xs">{message.text}</span>
+                  <p className={`bg-accent p-3 mr-2 rounded-md text-sm font-light`}>{message.text}</p>
                 ) : (
                   <img
                     src={message.text}
@@ -70,7 +70,7 @@ const MessageList = ({ messages, messagesLoading }: MessageListProps) => {
                   />
                 )}
                 {message.user.id === currentUser?.id && (
-                  <Avatar className="flex justify-center items-center">
+                  <Avatar className="flex justify-center items-center mt-auto">
                     <AvatarImage
                       src={currentUser?.image || "/user-placeholder.png"}
                       alt="User Image"

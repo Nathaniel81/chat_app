@@ -4,6 +4,7 @@ import { cn } from "../lib/utils";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Button } from "./ui/button";
 import { ScrollArea } from "./ui/scroll-area";
+import { ThemeSwitch } from "./ThemeSwitch";
 import {
   Tooltip,
   TooltipContent,
@@ -12,6 +13,7 @@ import {
 } from "./ui/tooltip";
 import { useEffect, useRef } from "react";
 import { useToast } from "./ui/use-toast";
+import { getCookie } from "../lib/utils";
 
 interface SidebarProps {
   isCollapsed: boolean;
@@ -19,11 +21,52 @@ interface SidebarProps {
 
 const Sidebar = ({ isCollapsed }: SidebarProps) => {
   const clientRef = useRef<WebSocket | null>(null);
-  const { selectedUser, setSelectedUser, user, users, updateUserStatus } = useUserContext();
+  const { 
+    selectedUser, 
+    setSelectedUser, 
+    user, 
+    users, 
+    setUsers,
+    updateUserStatus, 
+    logout 
+  } = useUserContext();
   const { toast } = useToast();
+
+  const fetchUsers = async () => {
+    const token = getCookie('access_token');
+
+    if (!token) {
+      console.error('No access token found in cookies');
+      return;
+    }
+
+    if (!user || !user.id) {
+      console.error('Current user is not defined');
+      return;
+    }
+  
+    try {
+      const response = await fetch(`/api/user/list/`, {
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+  
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }  
+      const data = await response.json();
+      setUsers(data);
+    } catch (error) {
+      console.error('Failed to fetch users:', error);
+    }
+  };
+
   
   useEffect(() => {
     if (user) {
+      fetchUsers();
       const newClient = new WebSocket(`ws://127.0.0.1:8000/ws/chat/global/?user_id=${user?.id}`);
       clientRef.current = newClient;
       newClient.onmessage = (message) => {
@@ -36,7 +79,7 @@ const Sidebar = ({ isCollapsed }: SidebarProps) => {
           const userIds = room_name.split('_').map(Number);
           // Check if the current user is in the userIds array
           if (userIds.includes(user?.id) && message.user.id !== user?.id) {
-            // Check if the message is from the selected conversation
+            // Check if the message is from the selected user
             if (!selectedUser || selectedUser?.id !== message.user.id) {
               toast({
                 title: `${message.user.username}`,
@@ -135,9 +178,19 @@ const Sidebar = ({ isCollapsed }: SidebarProps) => {
               <p className='font-bold'>{user?.username}</p>
             </div>
           )}
-          <div className='flex'>
-            <LogOut size={22} cursor={"pointer"} />
-          </div>
+          {isCollapsed ? (
+            <div className='space-y-4 flex-col items-center justify-center ml-5 md:ml-0'>
+              <div className='-ml-[8px]'>
+                <ThemeSwitch />
+              </div>
+              <LogOut size={22} cursor={"pointer"} onClick={logout} />
+            </div>
+            ): (
+            <div className='flex items-center justify-between gap-3'>
+              <ThemeSwitch />
+              <LogOut size={22} cursor={"pointer"} onClick={logout} />
+            </div>
+          )}
         </div>
       </div>
     </div>

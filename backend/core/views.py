@@ -1,6 +1,6 @@
 from django.conf import settings
 from django.db.models import Count
-from rest_framework import generics, permissions, status
+from rest_framework import generics, permissions, status, exceptions
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -69,48 +69,28 @@ class MyTokenObtainPairView(TokenObtainPairView):
                 samesite=settings.SIMPLE_JWT['AUTH_COOKIE_SAMESITE']
             )
         return response
-		
+
 class LogoutView(APIView):
-    """
-    Custom view for logging out users by blacklisting refresh tokens and deleting cookies.
-    """
-
     def post(self, request):
-        """
-        Handle POST request for logging out users.
-
-        This method blacklists the refresh token, deletes authentication cookies,
-        and returns a response indicating successful logout.
-
-        Args:
-            request (HttpRequest): The request object.
-
-        Returns:
-            Response: The HTTP response.
-        """
-
         try:
-            refreshToken = request.COOKIES.get(
-                settings.SIMPLE_JWT['AUTH_COOKIE_REFRESH'])
-            # Instantiate a RefreshToken object
-            token = tokens.RefreshToken(refreshToken)
+            refresh_token = request.COOKIES.get(settings.SIMPLE_JWT['AUTH_COOKIE_REFRESH'])
+            if not refresh_token:
+                return Response({'error': 'Refresh token not found in cookies'}, status=status.HTTP_400_BAD_REQUEST)
+            
+            token = tokens.RefreshToken(refresh_token)
             token.blacklist()
 
-            response = Response({'LoggedOut'})
-            # Delete authentication cookies
+            response = Response({'detail': 'Logged out successfully'}, status=status.HTTP_200_OK)
             response.delete_cookie(settings.SIMPLE_JWT['AUTH_COOKIE'])
             response.delete_cookie(settings.SIMPLE_JWT['AUTH_COOKIE_REFRESH'])
-
             return response
-
         except tokens.TokenError as e:
-            # If there's a TokenError, still construct a response and delete cookies
-            response = Response({'LoggedOut'})
+            response = Response({'detail': 'Token error occurred'}, status=status.HTTP_400_BAD_REQUEST)
             response.delete_cookie(settings.SIMPLE_JWT['AUTH_COOKIE'])
-            response.delete_cookie(settings.SIMPLE_JWT['AUTH_COOKIE_REFRESH'])
-        
+            response.delete_cookie(settings.SIMPLE_JWT['AUTH_COOKIE_REFRESH'])        
             return response
         except Exception as e:
+            print(f"Exception: {e}")
             raise exceptions.ParseError("Invalid token")
 
 class RefreshTokenView(APIView):
@@ -167,11 +147,12 @@ class RefreshTokenView(APIView):
 
 class UserListView(generics.ListAPIView):
     serializer_class = UserSerializer
+    permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        user_id = self.request.query_params.get('user_id', None)
-        if user_id is not None:
-            return User.objects.exclude(id=user_id)
+        user = self.request.user
+        if user is not None:
+            return User.objects.exclude(id=user.id)
         return User.objects.all()
 
 class ChatRoomView(generics.ListCreateAPIView):
@@ -180,6 +161,7 @@ class ChatRoomView(generics.ListCreateAPIView):
 
 class MessageListView(generics.ListAPIView):
     serializer_class = MessageSerializer
+    permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         room_name = self.kwargs['room_name']
@@ -190,34 +172,3 @@ class MessageListView(generics.ListAPIView):
             return Message.objects.none()
 
         return Message.objects.filter(chat_room=chat_room).order_by('created_at')
-
-class ConversationListCreateView(generics.ListCreateAPIView):
-    queryset = Conversation.objects.all()
-    serializer_class = ConversationSerializer
-    # permission_classes = [IsAuthenticated]
-
-    def get_queryset(self):
-        user = User.objects.get(username='B_admin')  # For now, using this user
-        # user = self.request.user
-        return Conversation.objects.filter(participants=user)
-
-    def perform_create(self, serializer):
-        data = self.request.data
-        participants = data.get('participants')
-        is_group = data.get('is_group')
-        group_name = data.get('group_name')
-
-        participants_ids = [user.get('id') for user in participants]
-
-        if not is_group and len(participants) == 2:
-            room_name = data.get('room_name')
-        else:
-            room_name = group_name
-
-        chat_room, created = ChatRoom.objects.get_or_create(name=room_name)
-        serializer.save(chat_room=chat_room, participants=participants_ids)
-
-class ConversationRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Conversation.objects.all()
-    serializer_class = ConversationSerializer
-    # permission_classes = [IsAuthenticated]

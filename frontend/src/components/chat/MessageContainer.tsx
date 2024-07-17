@@ -4,6 +4,7 @@ import { useUserContext } from "../../context/UserContext";
 import { IMessage } from "../../types";
 import MessageList from "./MessageList";
 import ChatBottomBar from "./ChatBottomBar";
+import { getCookie } from '../../lib/utils';
 
 const MessageContainer = () => {
   const {selectedUser, setSelectedUser, user:loggedUser } = useUserContext();
@@ -14,9 +15,17 @@ const MessageContainer = () => {
   const fetchMessages = async (roomName: string) => {
     try {
       setMessagesLoading(true);
-      const response = await fetch(`/api/messages/${roomName}/`);
-      const data = await response.json();
-      setMessages(data);
+      const response = await fetch(`/api/messages/${roomName}/`, {
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${getCookie('access_token')}`,
+          },
+        }
+      );
+      if (response.status === 200) {
+        const data = await response.json();
+        setMessages(data);
+      }
     } catch (error) {
       console.error('Failed to fetch messages:', error);
     } finally {

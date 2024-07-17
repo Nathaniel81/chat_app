@@ -14,8 +14,8 @@ const SignIn: React.FC = () => {
   const { setUser } = useUserContext();
 
   const handleSignIn = async (e: FormEvent) => {
-    setLoading(true);
     e.preventDefault();
+    setLoading(true);
     const url = '/api/user/login/';
     const data = { username, password };
 
@@ -30,6 +30,7 @@ const SignIn: React.FC = () => {
         const responseData = await response.json();
         localStorage.setItem('user', JSON.stringify(responseData));
         setUser(responseData);
+        //set token
         navigate('/');
       } else {
         console.error('Login failed. Check your credentials or API response.');
@@ -42,7 +43,7 @@ const SignIn: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center h-screen bg-gray-100">
+    <div className="flex flex-col items-center justify-center h-screen bg-transparent">
       <h1 className="text-2xl mb-4">Sign In</h1>
       <form className="grid w-full max-w-sm items-center gap-2.5" onSubmit={handleSignIn}>
         <Label htmlFor="username">Username</Label>
