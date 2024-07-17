@@ -1,5 +1,5 @@
 import React, { FormEvent, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useUserContext } from '../context/UserContext';
 import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
@@ -16,6 +16,7 @@ const SignIn: React.FC = () => {
   const handleSignIn = async (e: FormEvent) => {
     e.preventDefault();
     setLoading(true);
+
     const url = '/api/user/login/';
     const data = { username, password };
 
@@ -30,7 +31,6 @@ const SignIn: React.FC = () => {
         const responseData = await response.json();
         localStorage.setItem('user', JSON.stringify(responseData));
         setUser(responseData);
-        //set token
         navigate('/');
       } else {
         console.error('Login failed. Check your credentials or API response.');
@@ -39,6 +39,8 @@ const SignIn: React.FC = () => {
       console.error('Error making the request:', error);
     } finally {
       setLoading(false);
+      setUsername('');
+      setPassword('');
     }
   };
 
@@ -51,6 +53,7 @@ const SignIn: React.FC = () => {
           type="text" 
           id="username" 
           placeholder="Username"
+          value={username}
           onChange={(e) => setUsername(e.target.value)} />
 
         <Label htmlFor="password">Password</Label>
@@ -58,18 +61,22 @@ const SignIn: React.FC = () => {
           type="password" 
           id="password" 
           placeholder="Password"
+          value={password}
           onChange={(e) => setPassword(e.target.value)} />
 
         {loading ? (
           <Button className="w-full mt-4" disabled>
             <Loader2 className="w-4 h-4 animate-spin mr-2" /> Please wait...
           </Button>
-          ) : (
+        ) : (
           <Button className="w-full mt-4" type='submit'>
             Sign In
           </Button>
         )}
       </form>
+      <p className="mt-4">
+        Don't have an account? <Link to="/signup" className="text-blue-500">Sign up</Link>
+      </p>
     </div>
   );
 };
