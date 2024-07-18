@@ -112,6 +112,16 @@ CLOUDINARY_STORAGE = {
 # WSGI_APPLICATION = 'chat.wsgi.application'
 ASGI_APPLICATION = "chat.asgi.application"
 
+CACHES = {
+    'default': {
+        'BACKEND': 'django_redis.cache.RedisCache',
+        'LOCATION': os.getenv('REDIS_URL'),
+        # 'LOCATION': 'redis://127.0.0.1:6379/1',
+        'OPTIONS': {
+            'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+        }
+    }
+}
 
 CHANNEL_LAYERS = {
     'default': {
@@ -126,7 +136,7 @@ CHANNEL_LAYERS = {
 
 SIMPLE_JWT = {
   'ACCESS_TOKEN_LIFETIME': timedelta(days=2),
-  'REFRESH_TOKEN_LIFETIME': timedelta(days=4),
+  'REFRESH_TOKEN_LIFETIME': timedelta(days=3),
   'ROTATE_REFRESH_TOKENS': False,
   'BLACKLIST_AFTER_ROTATION': True,
   'UPDATE_LAST_LOGIN': False,
