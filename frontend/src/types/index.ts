@@ -3,6 +3,7 @@ export interface IUser {
   username: string;
   email: string;
   image?: string;
+  profile_picture?: string;
   is_online: boolean;
 }
   

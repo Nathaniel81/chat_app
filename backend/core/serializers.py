@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from cloudinary.utils import cloudinary_url
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework_simplejwt.tokens import RefreshToken
 from .models import User, ChatRoom, Message, Conversation
@@ -12,7 +13,20 @@ class UserSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = User
-        fields = ['id', 'username', 'is_online']
+        fields = ['id', 'username', 'profile_picture', 'is_online']
+
+    def to_representation(self, instance):
+        """
+        Convert the Post instance to a representation.
+
+        This method overrides the default to_representation method to include the file URL.
+        """
+
+        representation = super().to_representation(instance)
+        if instance.profile_picture:
+            # Add the file URL to the representation
+            representation['profile_picture'] = cloudinary_url(instance.profile_picture.public_id, secure=True)[0]
+        return representation
 
 class MessageSerializer(serializers.ModelSerializer):
     user = UserSerializer(read_only=True)
@@ -78,72 +92,43 @@ class RegistrationSerializer(serializers.ModelSerializer):
 
     password = serializers.CharField(write_only=True, required=True)
     confirmPassword = serializers.CharField(write_only=True, required=True)
-    tokens = serializers.SerializerMethodField(read_only=True)
-    token = serializers.SerializerMethodField(read_only=True)
+    profile_picture = serializers.ImageField(required=False, allow_null=True)
 
     class Meta:
         model = User
         fields = [
             'id', 
             'username', 
-            'name', 
+            'profile_picture',
             'email', 
             'password', 
             'confirmPassword', 
-            'tokens', 
-            'token'
         ]
         read_only_fields = ['id']
 
     def validate(self, data):
-        """
-        Validate the registration serializer data.
-
-        This method validates the password and confirmPassword fields.
-
-        Args:
-            data (dict): The serializer data.
-
-        Returns:
-            dict: The validated data.
-
-        Raises:
-            serializers.ValidationError: If passwords do not match.
-        """
-
         if data['password'] != data['confirmPassword']:
             raise serializers.ValidationError("Passwords do not match.")
         return data
 
     def save(self, validated_data):
-        """
-        Save the registration serializer data.
-
-        This method creates a new user account, sets the password, generates access and refresh tokens,
-        and returns the validated data.
-
-        Args:
-            validated_data (dict): The validated serializer data.
-
-        Returns:
-            dict: The validated data.
-        """
-
         validated_data.pop('confirmPassword')
-        user = User.objects.create(
-            name=validated_data['name'],
-            username=validated_data['username'],
-            email=validated_data['email']
-        )
+        profile_picture = validated_data.pop('profile_picture', None)
+        user = User.objects.create(**validated_data)
         user.set_password(validated_data['password'])
-        user.save()
         
+        if profile_picture:
+            user.profile_picture = profile_picture
+            user.save() 
+
         validated_data['id'] = user.id
 
         refresh_token = RefreshToken.for_user(user)
         access_token = str(refresh_token.access_token)
-
         validated_data['access_token'] = access_token
         validated_data['refresh_token'] = refresh_token
+
+        if user.profile_picture:
+            validated_data['profile_picture'] = user.profile_picture.url
 
         return validated_data

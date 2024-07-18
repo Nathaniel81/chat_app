@@ -13,6 +13,10 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 import os
 from pathlib import Path
 from datetime import timedelta
+
+import cloudinary
+import cloudinary.api
+import cloudinary.uploader
 import dj_database_url
 from dotenv import load_dotenv
 
@@ -50,7 +54,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-
+    'cloudinary',
     'core',
     'rest_framework',
     'corsheaders',
@@ -92,6 +96,18 @@ REST_FRAMEWORK = {
     ),
 }
 
+# Cloudinary - Django Integration
+cloudinary.config(
+    cloud_name=os.getenv('CLOUDINARY_NAME'),
+    api_key=os.getenv('CLOUDINARY_API_KEY'),
+    api_secret=os.getenv('CLOUDINARY_API_SECRET_KEY'),
+)
+
+CLOUDINARY_STORAGE = {
+    'CLOUD_NAME': os.getenv('CLOUDINARY_NAME'),
+    'API_KEY': os.getenv('CLOUDINARY_API_KEY'),
+    'API_SECRET': os.getenv('CLOUDINARY_API_SECRET_KEY'),
+}
 
 # WSGI_APPLICATION = 'chat.wsgi.application'
 ASGI_APPLICATION = "chat.asgi.application"
@@ -101,8 +117,8 @@ CHANNEL_LAYERS = {
     'default': {
         'BACKEND': 'channels_redis.core.RedisChannelLayer',
         'CONFIG': {
-            # "hosts": [('127.0.0.1', 6379)],
-            "hosts": [os.getenv('REDIS_URL')]
+            "hosts": [('127.0.0.1', 6379)],
+            # "hosts": [os.getenv('REDIS_URL')]
         },
     },
 }

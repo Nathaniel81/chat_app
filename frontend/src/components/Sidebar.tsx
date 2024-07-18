@@ -67,7 +67,8 @@ const Sidebar = ({ isCollapsed }: SidebarProps) => {
   useEffect(() => {
     if (user) {
       fetchUsers();
-      const newClient = new WebSocket(`ws://127.0.0.1:8000/ws/chat/global/?user_id=${user?.id}`);
+      // const newClient = new WebSocket(`ws://127.0.0.1:8000/ws/chat/global/?user_id=${user?.id}`);
+      const newClient = new WebSocket(`wss://chat-api-e2xv.onrender.com/ws/chat/global/?user_id=${user?.id}`);
       clientRef.current = newClient;
       newClient.onmessage = (message) => {
         const data = JSON.parse(message.data as string);
@@ -117,7 +118,7 @@ const Sidebar = ({ isCollapsed }: SidebarProps) => {
                         <div className='absolute top-0 right-0 w-2.5 h-2.5 bg-green-500 rounded-full border-2 border-foreground' />
                       )}
                       <AvatarImage
-                        src={user.image || "/user-placeholder.png"}
+                        src={user.profile_picture || "/user-placeholder.png"}
                         alt='User Image'
                         className='border-2 border-white rounded-full w-10 h-10'
                       />
@@ -148,7 +149,7 @@ const Sidebar = ({ isCollapsed }: SidebarProps) => {
                   <div className='absolute top-0 right-0 w-2.5 h-2.5 bg-green-500 rounded-full border-2 border-foreground' />
                 )}
                 <AvatarImage
-                  src={user.image || "/user-placeholder.png"}
+                  src={user.profile_picture || "/user-placeholder.png"}
                   alt={"User image"}
                   className='w-10 h-10'
                 />
@@ -169,7 +170,7 @@ const Sidebar = ({ isCollapsed }: SidebarProps) => {
             <div className='hidden md:flex gap-2 items-center'>
               <Avatar className='flex justify-center items-center'>
                 <AvatarImage
-                  src={user?.image || "/user-placeholder.png"}
+                  src={user?.profile_picture || "/user-placeholder.png"}
                   alt='avatar'
                   referrerPolicy='no-referrer'
                   className='w-8 h-8 border-2 border-white rounded-full'

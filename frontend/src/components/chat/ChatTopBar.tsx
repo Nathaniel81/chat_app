@@ -13,7 +13,7 @@ const ChatTopBar = () => {
             <div className='absolute top-0 right-0 w-2.5 h-2.5 bg-green-500 rounded-full border-2 border-foreground' />
           )}
           <AvatarImage
-            src={selectedUser?.image || "/user-placeholder.png"}
+            src={selectedUser?.profile_picture || "/user-placeholder.png"}
             alt='User Image'
             className='w-10 h-10 object-cover rounded-full'
           />

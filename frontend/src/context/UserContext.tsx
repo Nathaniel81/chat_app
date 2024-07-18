@@ -31,6 +31,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
   const selectedUserRef = useRef<IUser | null>(null);
 
   const logout = async () => {
+    setSelectedUser(null);
     const url = '/api/user/logout/';
     try {
       const response = await fetch(url, {

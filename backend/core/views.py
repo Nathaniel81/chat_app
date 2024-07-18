@@ -2,6 +2,7 @@ from django.conf import settings
 from django.db.models import Count
 from rest_framework import generics, permissions, status, exceptions
 from rest_framework.exceptions import PermissionDenied
+from rest_framework.exceptions import ValidationError
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.throttling import AnonRateThrottle
@@ -16,7 +17,8 @@ from .serializers import (
     UserSerializer, 
     ChatRoomSerializer, 
     MessageSerializer,
-    ConversationSerializer
+    ConversationSerializer,
+    RegistrationSerializer
     )
 
 class LoginRateThrottle(AnonRateThrottle):
@@ -69,6 +71,51 @@ class MyTokenObtainPairView(TokenObtainPairView):
                 samesite=settings.SIMPLE_JWT['AUTH_COOKIE_SAMESITE']
             )
         return response
+
+class RegistrationView(generics.CreateAPIView):
+    """
+    Custom registration view for creating user accounts and setting authentication cookies.
+    """
+
+    serializer_class = RegistrationSerializer
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        try:
+            if serializer.is_valid(raise_exception=True):
+                serializedData = serializer.save(validated_data=serializer.validated_data)
+                response = Response({
+                    'id': serializedData['id'],
+                    'username': serializedData['username'],
+                    'email': serializedData['email'],
+                    'profile_picture': serializedData['profile_picture'],
+                }, status=status.HTTP_201_CREATED)
+                access_token = serializedData.get('access_token')
+                refresh_token = serializedData.get('refresh_token')
+                response.set_cookie(
+                        key=settings.SIMPLE_JWT['AUTH_COOKIE'],
+                        value=access_token,
+                        expires=settings.SIMPLE_JWT['ACCESS_TOKEN_LIFETIME'],
+                        secure=settings.SIMPLE_JWT['AUTH_COOKIE_SECURE'],
+                        httponly=settings.SIMPLE_JWT['AUTH_COOKIE_HTTP_ONLY'],
+                        samesite=settings.SIMPLE_JWT['AUTH_COOKIE_SAMESITE']
+                )
+                response.set_cookie(
+                       key=settings.SIMPLE_JWT['AUTH_COOKIE_REFRESH'],
+                       value=refresh_token,
+                       expires=settings.SIMPLE_JWT['ACCESS_TOKEN_LIFETIME'],
+                       secure=settings.SIMPLE_JWT['AUTH_COOKIE_SECURE'],
+                       httponly=settings.SIMPLE_JWT['AUTH_COOKIE_HTTP_ONLY'],
+                       samesite=settings.SIMPLE_JWT['AUTH_COOKIE_SAMESITE']
+                )
+                return response
+        except ValidationError as e:
+            if 'email' in e.detail and 'already exists' in str(e.detail['email']):
+                return Response(
+                    {"error": "A user with this email already exists."},
+                    status=status.HTTP_409_CONFLICT
+                )
+            return Response(e.detail, status=status.HTTP_400_BAD_REQUEST)
 
 class LogoutView(APIView):
     def post(self, request):

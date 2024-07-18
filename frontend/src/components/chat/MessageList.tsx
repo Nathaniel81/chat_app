@@ -28,7 +28,7 @@ const MessageList = ({ messages, messagesLoading }: MessageListProps) => {
         {!messagesLoading &&
           messages?.map((message, index) => (
             <motion.div
-              key={index}
+              key={message.id || `message-${index}`}
               layout
               initial={{ opacity: 0, scale: 1, y: 50, x: 0 }}
               animate={{ opacity: 1, scale: 1, y: 0, x: 0 }}

@@ -37,8 +37,8 @@ const MessageContainer = () => {
     if (clientRef.current) {
       clientRef.current.close();
     }
-    const newClient = new WebSocket(`ws://127.0.0.1:8000/ws/chat/${roomName}/?user_id=${loggedUser?.id}`);
-    // const newClient = new WebSocket(`wss://chat-api-e2xv.onrender.com/ws/chat/${roomName}/?user_id=${loggedUser?.id}`);
+    // const newClient = new WebSocket(`ws://127.0.0.1:8000/ws/chat/${roomName}/?user_id=${loggedUser?.id}`);
+    const newClient = new WebSocket(`wss://chat-api-e2xv.onrender.com/ws/chat/${roomName}/?user_id=${loggedUser?.id}`);
     clientRef.current = newClient;
     newClient.onopen = () => {
       console.log('WebSocket Client Connected');

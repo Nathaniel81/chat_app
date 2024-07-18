@@ -4,6 +4,9 @@ import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
 import { Button } from '../components/ui/button';
 import { Avatar, AvatarImage } from '../components/ui/avatar';
+import { Loader2 } from 'lucide-react';
+import { useUserContext } from '../context/UserContext';
+import { useToast } from '../components/ui/use-toast';
 
 const SignUp: React.FC = () => {
   const [username, setUsername] = useState('');
@@ -14,11 +17,49 @@ const SignUp: React.FC = () => {
   const [imagePreview, setImagePreview] = useState<string | undefined>(undefined);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const { toast } = useToast();
+  const { setUser } = useUserContext();
 
   const handleSignUp = async (e: FormEvent) => {
     e.preventDefault();
+
+    if (password !== confirmPassword) {
+      return toast({
+        description: 'Passwords do not match',
+      });
+    }
+
     setLoading(true);
-    setLoading(false);
+
+    const formData = new FormData();
+    formData.append('username', username);
+    formData.append('email', email);
+    formData.append('password', password);
+    formData.append('confirmPassword', confirmPassword);
+
+    if (image) {
+      formData.append('profile_picture', image);
+    }
+
+    try {
+      const response = await fetch('/api/user/register/', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+
+      const responseData = await response.json();
+      localStorage.setItem('user', JSON.stringify(responseData));
+      setUser(responseData);
+      navigate('/');
+    } catch (error) {
+      console.error('Failed to sign up:', error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
