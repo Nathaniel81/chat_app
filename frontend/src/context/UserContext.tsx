@@ -32,6 +32,8 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
 
   const logout = async () => {
     setSelectedUser(null);
+    localStorage.removeItem('user');
+    setUser(null);
     const url = '/api/user/logout/';
     try {
       const response = await fetch(url, {
@@ -45,8 +47,6 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     } catch (error) {
       console.error('Error making the request:', error);
     }
-    localStorage.removeItem('user');
-    setUser(null);
   };
 
   const updateUserStatus = (username: string, is_online: boolean) => {

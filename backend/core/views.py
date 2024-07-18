@@ -17,7 +17,6 @@ from .serializers import (
     UserSerializer, 
     ChatRoomSerializer, 
     MessageSerializer,
-    ConversationSerializer,
     RegistrationSerializer
     )
 
