@@ -73,6 +73,7 @@ const Sidebar = ({ isCollapsed }: SidebarProps) => {
       newClient.onmessage = (message) => {
         const data = JSON.parse(message.data as string);
         if (data.type === 'user_status') {
+          console.log('User logged in. Updating status..')
           updateUserStatus(data.user, data.status === 'online');
         }
         if (data.type === 'global_message') {

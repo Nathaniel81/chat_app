@@ -43,20 +43,6 @@ class ChatRoomSerializer(serializers.ModelSerializer):
         model = ChatRoom
         fields = ['id', 'name', 'messages']
 
-class ConversationSerializer(serializers.ModelSerializer):
-    admin = UserSerializer(read_only=True)
-    participants = UserSerializer(read_only=True, many=True)
-    chat_room = serializers.StringRelatedField()
-    last_message = serializers.SerializerMethodField(read_only=True)
-
-    class Meta:
-        model = Conversation
-        fields = '__all__'
-
-    def get_last_message(self, obj):
-        last_message = obj.chat_room.messages.last()
-        return MessageSerializer(last_message).data if last_message else None
-
 class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
     """
     Custom token obtain pair serializer.
