@@ -28,7 +28,7 @@ const Sidebar = ({ isCollapsed }: SidebarProps) => {
     users, 
     setUsers,
     updateUserStatus, 
-    logout 
+    logout
   } = useUserContext();
   const { toast } = useToast();
 
@@ -37,6 +37,7 @@ const Sidebar = ({ isCollapsed }: SidebarProps) => {
 
     if (!token) {
       console.error('No access token found in cookies');
+      logout();
       return;
     }
 
@@ -63,7 +64,6 @@ const Sidebar = ({ isCollapsed }: SidebarProps) => {
     }
   };
 
-  
   useEffect(() => {
     if (user) {
       fetchUsers();

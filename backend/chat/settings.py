@@ -96,9 +96,14 @@ REST_FRAMEWORK = {
 # WSGI_APPLICATION = 'chat.wsgi.application'
 ASGI_APPLICATION = "chat.asgi.application"
 
+
 CHANNEL_LAYERS = {
     'default': {
-        'BACKEND': 'channels.layers.InMemoryChannelLayer',
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            # "hosts": [('127.0.0.1', 6379)],
+            "hosts": [os.getenv('REDIS_URL')]
+        },
     },
 }
 
