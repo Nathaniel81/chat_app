@@ -50,11 +50,11 @@ const MessageList = ({ messages, messagesLoading }: MessageListProps) => {
                 message.user.id === currentUser?.id ? "items-end" : "items-start"
               )}
             >
-              <div className="flex gap-3 items-center">
+              <div className="flex gap-3 items-end">
                 {message.user.id == selectedUser?.id && (
                   <Avatar className="flex justify-center items-center">
                     <AvatarImage
-                      src={selectedUser?.image || "/user-placeholder.png"}
+                      src={selectedUser?.profile_picture || "/placeholder.png"}
                       alt="User Image"
                       className="border-2 border-white rounded-full"
                     />
@@ -70,9 +70,9 @@ const MessageList = ({ messages, messagesLoading }: MessageListProps) => {
                   />
                 )}
                 {message.user.id === currentUser?.id && (
-                  <Avatar className="flex justify-center items-center mt-auto">
+                  <Avatar className="flex justify-center items-center">
                     <AvatarImage
-                      src={currentUser?.image || "/user-placeholder.png"}
+                      src={currentUser?.profile_picture || "/placeholder.png"}
                       alt="User Image"
                       className="border-2 border-white rounded-full"
                     />

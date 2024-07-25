@@ -1,5 +1,5 @@
 import React, { useState, FormEvent } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
 import { Button } from '../components/ui/button';
@@ -56,6 +56,10 @@ const SignUp: React.FC = () => {
       setUser(responseData);
       navigate('/');
     } catch (error) {
+      toast({
+        title: 'Failed to sign up',
+        description: `${error}`,
+      });
       console.error('Failed to sign up:', error);
     } finally {
       setLoading(false);
@@ -132,6 +136,9 @@ const SignUp: React.FC = () => {
           </Button>
         )}
       </form>
+      <p className="mt-4">
+        Already have an account? <Link to="/signin" className="text-blue-500">Sign in</Link>
+      </p>
     </div>
   );
 };

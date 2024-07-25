@@ -5,6 +5,7 @@ import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
 import { Button } from '../components/ui/button';
 import { Loader2 } from 'lucide-react';
+import { useToast } from '../components/ui/use-toast';
 
 const SignIn: React.FC = () => {
   const [username, setUsername] = useState('');
@@ -12,6 +13,7 @@ const SignIn: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const { setUser } = useUserContext();
+  const { toast } = useToast();
 
   const handleSignIn = async (e: FormEvent) => {
     e.preventDefault();
@@ -33,9 +35,17 @@ const SignIn: React.FC = () => {
         setUser(responseData);
         navigate('/');
       } else {
+        toast({
+          title: 'Login failed.',
+          description: 'Check your credentials or API response.',
+        });
         console.error('Login failed. Check your credentials or API response.');
       }
     } catch (error) {
+      toast({
+        title: 'Login failed.',
+        description: `Error making the request:, ${error}`,
+      });
       console.error('Error making the request:', error);
     } finally {
       setLoading(false);

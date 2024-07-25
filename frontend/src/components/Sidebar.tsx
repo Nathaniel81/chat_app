@@ -114,16 +114,18 @@ const Sidebar = ({ isCollapsed }: SidebarProps) => {
               <Tooltip delayDuration={0}>
                 <TooltipTrigger asChild>
                   <>
-                    <Avatar className='my-1 flex justify-center items-center overflow-visible relative'>
+                    <Avatar className='my-3 flex justify-center items-center overflow-visible relative'>
                       {user?.is_online && (
                         <div className='absolute top-0 right-0 w-2.5 h-2.5 bg-green-500 rounded-full border-2 border-foreground' />
                       )}
                       <AvatarImage
-                        src={user.profile_picture || "/user-placeholder.png"}
+                        src={user.profile_picture || "/placeholder.png"}
                         alt='User Image'
                         className='border-2 border-white rounded-full w-10 h-10'
                       />
-                      <AvatarFallback>{user.username}</AvatarFallback>
+                      <AvatarFallback>
+                        <div className='animate-pulse bg-gray-tertiary w-full h-full rounded-full'></div>
+                      </AvatarFallback>
                     </Avatar>
                     <span className='sr-only'>{user.username}</span>
                   </>
@@ -150,9 +152,9 @@ const Sidebar = ({ isCollapsed }: SidebarProps) => {
                   <div className='absolute top-0 right-0 w-2.5 h-2.5 bg-green-500 rounded-full border-2 border-foreground' />
                 )}
                 <AvatarImage
-                  src={user.profile_picture || "/user-placeholder.png"}
+                  src={user.profile_picture || "/placeholder.png"}
                   alt={"User image"}
-                  className='w-10 h-10'
+                  className='w-10 h-10 rounded-full'
                 />
                 <AvatarFallback>{user.username}</AvatarFallback>
               </Avatar>
@@ -171,7 +173,7 @@ const Sidebar = ({ isCollapsed }: SidebarProps) => {
             <div className='hidden md:flex gap-2 items-center'>
               <Avatar className='flex justify-center items-center'>
                 <AvatarImage
-                  src={user?.profile_picture || "/user-placeholder.png"}
+                  src={user?.profile_picture || "/placeholder.png"}
                   alt='avatar'
                   referrerPolicy='no-referrer'
                   className='w-8 h-8 border-2 border-white rounded-full'
