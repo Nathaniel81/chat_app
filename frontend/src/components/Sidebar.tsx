@@ -156,7 +156,9 @@ const Sidebar = ({ isCollapsed }: SidebarProps) => {
                   alt={"User image"}
                   className='w-10 h-10 rounded-full'
                 />
-                <AvatarFallback>{user.username}</AvatarFallback>
+                <AvatarFallback>
+                  <div className='animate-pulse bg-gray-tertiary w-full h-full rounded-full'></div>
+                </AvatarFallback>
               </Avatar>
               <div className='flex flex-col max-w-28'>
                 <span>{user.username}</span>
