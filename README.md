@@ -26,7 +26,7 @@ This project also emphasized the importance of secure user authentication and ef
 Stay tuned for more updates as I continue to refine and expand this project!
 
 ## Get in Touch
-
+ 
 I welcome any questions or suggestions. Your feedback is greatly appreciated!
 
 ## **Live Demo**
